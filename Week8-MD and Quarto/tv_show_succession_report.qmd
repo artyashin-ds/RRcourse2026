@@ -1,0 +1,80 @@
+---
+title: "Succession: Viewership Report"
+author: "Artemiy Yashin 358561"
+date: "4-16-2026"
+format: html
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+# Succession
+
+*Succession* is an American satirical comedy-drama television series created by Jesse Armstrong. It centers on the Roy family, the dysfunctional owners of Waystar RoyCo, a global media and entertainment conglomerate. The series follows the family members as they fight for control of the company amid uncertainty about the health of the family's patriarch, *Logan Roy*.
+
+![Succession Title Card](images/succession.png)
+
+## Viewership Statistics
+
+The show garnered significant critical acclaim and a dedicated audience over its four-season run on HBO. Below is a summary of the average US viewership for each season.
+
+```{r}
+#| label: load-data
+
+library(ggplot2)
+library(knitr)
+
+# Average US viewers in millions (Data sourced from Wikipedia)
+season <- c(1, 2, 3, 4)
+viewers <- c(0.603, 0.597, 0.553, 0.705)
+succession_data <- data.frame(Season = season, Viewers = viewers)
+
+# Calculate season-to-season change
+succession_data$Change <- c(NA, diff(succession_data$Viewers))
+
+# Display as a clean table
+kable(succession_data, 
+      col.names = c("Season", "Average Viewers (Millions)", "Change (Millions)"), 
+      caption = "Succession Viewership Summary")
+#| label: fig-viewership
+#| fig-cap: "Average US viewership per season for Succession."
+```
+
+## Viewership Over Time
+
+```{r}
+ggplot(succession_data, aes(x = Season, y = Viewers)) +
+  geom_line(color = "#4A90E2", linewidth = 1) +
+  geom_point(color = "#1C2833", size = 3) +
+  theme_minimal() +
+  labs(x = "Season", y = "Average Viewers (Millions)") +
+  scale_x_continuous(breaks = 1:4)
+```
+
+## Season-to-Season Changes
+
+```{r}
+#| label: fig-changes
+#| fig-cap: "Change in average viewership compared to the previous season."
+
+# Filter out the first season since it has no prior season to compare to
+change_data <- succession_data[!is.na(succession_data$Change), ]
+
+ggplot(change_data, aes(x = factor(Season), y = Change, fill = Change > 0)) +
+  geom_col() +
+  theme_minimal() +
+  scale_fill_manual(values = c("TRUE" = "#2ECC71", "FALSE" = "#E74C3C")) +
+  labs(x = "Season", y = "Change in Viewers (Millions)") +
+  theme(legend.position = "none")
+```
+
+## Observed Changes
+
+```{r}
+#| label: calc-changes
+# Save the specific change between Season 3 and 4 to a variable for inline text
+change_s3_to_s4 <- succession_data$Change[4]
+```
+
+As seen in the data, the viewership experienced a slight dip during the middle seasons. However, the show saw a massive resurgence in its final season. Most notably, the viewership increased by r change_s3_to_s4 million viewers between Season 3 and Season 4, culminating in the show's highest average ratings.
